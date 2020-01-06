@@ -1,0 +1,15 @@
+name: 'Rdm Model Feature'
+type: module
+core: 8.x
+dependencies:
+  - context
+  - features
+  - field
+  - file
+  - image
+  - islandora
+  - islandora_rdm_multifile_media
+  - language
+  - media
+  - system
+package: 'Islandora RDM'

@@ -1,0 +1,8 @@
+name: 'Islandora RDM Multifile Media'
+type: module
+description: 'Attach microservice derivatives to existing media'
+core: 8.x
+package: 'Islandora RDM'
+dependencies:
+  - hook_post_action
+  - islandora

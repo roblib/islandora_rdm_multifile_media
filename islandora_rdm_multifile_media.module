@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Contains playground.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\media\MediaInterface;
+
+/**
+ * Implements hook_media_update().
+ */
+function islandora_rdm_multifile_media_media_update(MediaInterface $media) {
+  $media_source_service = \Drupal::service('islandora.media_source_service');
+
+  // Exit early if nothing's changed.
+  $utils = \Drupal::service('islandora.utils');
+  if (!$utils->haveFieldsChanged($media, $media->original)) {
+    return;
+  };
+
+  // Does it have a source field?
+  $source_field = $media_source_service->getSourceFieldName($media->bundle());
+  if (empty($source_field)) {
+    return;
+  }
+
+  // Exit early if the source file did not change.
+  if ($media->get($source_field)->equals($media->original->get($source_field))) {
+    return;
+  }
+  // If it has a parent node...
+  $node = $utils->getParentNode($media);
+  if ($node) {
+    // Fire off derivative reactions for the Media.
+    $utils->executeMediaReactions('\Drupal\islandora\Plugin\ContextReaction\DerivativeFileReaction', $media);
+  }
+}
+
+/**
+ * Implements hook_ENTITYTYPE_postsave().
+ */
+function islandora_rdm_multifile_media_media_postsave(EntityInterface $media, $op) {
+
+  $utils = \Drupal::service('islandora.utils');
+  // Add derived file to the media.
+  if ($op == 'insert') {
+    $utils->executeMediaReactions('\Drupal\islandora_rdm_multifile_media\Plugin\ContextReaction\DerivativeFileReaction', $media);
+  }
+
+}
