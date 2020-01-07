@@ -1,0 +1,24 @@
+{
+  "name": "islandora-rdm/islandora_rdm_multifile_media",
+  "description": "Islandora multiple-file media content model extension",
+  "type": "drupal-module",
+  "homepage": "https://github.com/roblib/islandora_rdm_multifile_media",
+  "authors": [
+    {
+      "name" : "Alan Stanley",
+      "homepage": "https://www.drupal.org/u/alan_stanley",
+      "role" : "Maintainer"
+    },
+    {
+      "name": "Alexander O'Neill (alxp)",
+      "homepage": "https://www.drupal.org/u/alxp",
+      "role": "Maintainer"
+    }
+  ],
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/hook_post_action": "*",
+    "islandora/islandora": "*"
+  }
+}
