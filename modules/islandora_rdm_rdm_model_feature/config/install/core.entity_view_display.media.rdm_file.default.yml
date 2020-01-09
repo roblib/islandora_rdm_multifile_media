@@ -2,24 +2,22 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.rdm_image.field_file_size
-    - field.field.media.rdm_image.field_fits_file
-    - field.field.media.rdm_image.field_height
-    - field.field.media.rdm_image.field_image_service_file
-    - field.field.media.rdm_image.field_media_image_1
-    - field.field.media.rdm_image.field_media_of
-    - field.field.media.rdm_image.field_mime_type
-    - field.field.media.rdm_image.field_width
-    - field.field.media.rdm_image.fits_ois_file_information_md5che
+    - field.field.media.rdm_file.field_access_terms
+    - field.field.media.rdm_file.field_file_size
+    - field.field.media.rdm_file.field_fits_file
+    - field.field.media.rdm_file.field_media_file_1
+    - field.field.media.rdm_file.field_media_of
+    - field.field.media.rdm_file.field_mime_type
     - image.style.thumbnail
-    - media.type.rdm_image
+    - media.type.rdm_file
   module:
     - file
     - image
+    - islandora_fits
     - user
-id: media.rdm_image.default
+id: media.rdm_file.default
 targetEntityType: media
-bundle: rdm_image
+bundle: rdm_file
 mode: default
 content:
   created:
@@ -32,6 +30,14 @@ content:
       custom_date_format: ''
       timezone: ''
     third_party_settings: {  }
+  field_access_terms:
+    weight: 10
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   field_file_size:
     weight: 7
     label: above
@@ -42,38 +48,19 @@ content:
     type: number_integer
     region: content
   field_fits_file:
-    weight: 14
-    label: above
-    settings:
-      use_description_as_link_text: true
+    weight: 11
+    label: hidden
+    settings: {  }
     third_party_settings: {  }
-    type: file_default
+    type: fits_formatter
     region: content
-  field_height:
-    weight: 10
-    label: above
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
-    third_party_settings: {  }
-    type: number_integer
-    region: content
-  field_image_service_file:
-    weight: 13
-    label: above
-    settings:
-      use_description_as_link_text: true
-    third_party_settings: {  }
-    type: file_default
-    region: content
-  field_media_image_1:
+  field_media_file_1:
     weight: 6
     label: above
     settings:
-      image_style: ''
-      image_link: ''
+      use_description_as_link_text: true
     third_party_settings: {  }
-    type: image
+    type: file_default
     region: content
   field_media_of:
     weight: 8
@@ -85,23 +72,6 @@ content:
     region: content
   field_mime_type:
     weight: 9
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
-  field_width:
-    weight: 11
-    label: above
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
-    third_party_settings: {  }
-    type: number_integer
-    region: content
-  fits_ois_file_information_md5che:
-    weight: 12
     label: above
     settings:
       link_to_entity: false

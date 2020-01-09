@@ -1,2 +1,4 @@
 bundle: islandora_rdm
+excluded:
+  - block.block.exposedformrdm_solr_search_contentpage_1
 required: true
