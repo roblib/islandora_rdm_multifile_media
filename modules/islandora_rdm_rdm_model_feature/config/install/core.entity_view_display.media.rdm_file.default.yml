@@ -12,6 +12,7 @@ dependencies:
     - field.field.media.rdm_file.field_media_model
     - field.field.media.rdm_file.field_media_of
     - field.field.media.rdm_file.field_mime_type
+    - field.field.media.rdm_file.field_thumbnail_file
     - image.style.thumbnail
     - media.type.rdm_file
   module:
@@ -113,6 +114,14 @@ content:
       link_to_entity: false
     third_party_settings: {  }
     type: string
+    region: content
+  field_thumbnail_file:
+    weight: 16
+    label: above
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    type: file_default
     region: content
   thumbnail:
     type: image
