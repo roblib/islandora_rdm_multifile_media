@@ -1,4 +1,5 @@
 bundle: islandora_rdm
 excluded:
-  - block.block.exposedformrdm_solr_search_contentpage_1
+  - media.type.rdm_file
+  - views.view.rdm_solr_search_content
 required: true

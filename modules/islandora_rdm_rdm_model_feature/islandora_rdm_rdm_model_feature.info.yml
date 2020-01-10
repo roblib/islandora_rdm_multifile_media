@@ -18,5 +18,8 @@ dependencies:
   - media
   - path
   - system
+  - taxonomy
+  - text
+  - uppy
   - user
 package: 'Islandora RDM'
