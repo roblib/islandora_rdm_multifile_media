@@ -18,7 +18,7 @@ islandora_text_extraction.attach_file_to_media:
     _controller: '\Drupal\islandora_rdm_multifile_media\Controller\MediaSourceController::attachTextToMedia'
   methods: [GET, PUT]
   requirements:
-    _custom_access: '\Drupal\islandora\Controller\MediaSourceController::attachToMediaAccess'
+    _custom_access: '\Drupal\islandora_rdm_multifile_media\Controller\MediaSourceController::attachToMediaAccess'
   options:
     _auth: ['basic_auth', 'cookie', 'jwt_auth']
     no_cache: 'TRUE'
