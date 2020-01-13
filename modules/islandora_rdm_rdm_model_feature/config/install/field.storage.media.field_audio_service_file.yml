@@ -8,15 +8,15 @@ dependencies:
 third_party_settings:
   field_permissions:
     permission_type: public
-id: media.field_thumbnail_file
-field_name: field_thumbnail_file
+id: media.field_audio_service_file
+field_name: field_audio_service_file
 entity_type: media
 type: file
 settings:
-  target_type: file
   display_field: false
   display_default: false
   uri_scheme: public
+  target_type: file
 module: file
 locked: false
 cardinality: 1
