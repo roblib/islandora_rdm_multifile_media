@@ -3,6 +3,7 @@ type: module
 core: 8.x
 dependencies:
   - context
+  - csv_field_preview
   - features
   - field
   - field_permissions
