@@ -16,6 +16,7 @@ dependencies:
     - image.style.thumbnail
     - media.type.rdm_file
   module:
+    - csv_field_preview
     - file
     - image
     - islandora_fits
@@ -86,10 +87,9 @@ content:
   field_media_file_1:
     weight: 6
     label: above
-    settings:
-      use_description_as_link_text: true
+    settings: {  }
     third_party_settings: {  }
-    type: file_default
+    type: csv_preview
     region: content
   field_media_model:
     weight: 15
