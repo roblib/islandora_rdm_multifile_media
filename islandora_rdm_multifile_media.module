@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\media\MediaInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_media_update().
@@ -49,4 +50,38 @@ function islandora_rdm_multifile_media_media_postsave(EntityInterface $media, $o
     $utils->executeMediaReactions('\Drupal\islandora_rdm_multifile_media\Plugin\ContextReaction\DerivativeFileReaction', $media);
   }
 
+}
+
+/**
+ * Implements hook_entity_view_mode_alter().
+ */
+function islandora_rdm_multifile_media_entity_view_mode_alter(&$view_mode, EntityInterface $entity) {
+  // Change the view mode based on user input from a 'view_mode_alter'
+  // ContextReaction.
+  $entity_type = $entity->getEntityType()->id();
+  $storage = \Drupal::service('entity_type.manager')->getStorage('entity_view_mode');
+  $context_manager = \Drupal::service('context.manager');
+  $current_entity = \Drupal::routeMatch()->getParameter($entity_type);
+  $current_id = ($current_entity instanceof MediaInterface) ? $current_entity->id() : NULL;
+  if (isset($current_id) && $current_id == $entity->id()) {
+    foreach ($context_manager->getActiveReactions('\Drupal\islandora\Plugin\ContextReaction\ViewModeAlterReaction') as $reaction) {
+      // Construct the new view mode's machine name.
+      $entity_type = $entity->getEntityTypeId();
+      $mode = $reaction->execute();
+      $machine_name = "$entity_type.$mode";
+
+      // Try to load it.
+      $new_mode = $storage->load($machine_name);
+
+      // If successful, alter the view mode.
+      if ($new_mode) {
+        $view_mode = $mode;
+      }
+      else {
+        // Otherwise, leave it be, but log a message.
+        \Drupal::logger('islandora')
+          ->info("EntityViewMode $machine_name does not exist.  View mode cannot be altered.");
+      }
+    }
+  }
 }
