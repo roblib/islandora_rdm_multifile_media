@@ -2,16 +2,16 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.media.field_service_file
+    - field.storage.media.field_audio_service_file
     - media.type.rdm_audio
   module:
     - file
-id: media.rdm_audio.field_service_file
-field_name: field_service_file
+id: media.rdm_audio.field_audio_service_file
+field_name: field_audio_service_file
 entity_type: media
 bundle: rdm_audio
-label: 'Service File'
-description: 'Web friendly derivative of source file.'
+label: 'Audio Service File'
+description: ''
 required: false
 translatable: false
 default_value: {  }
