@@ -7,6 +7,7 @@ dependencies:
     - field.field.media.rdm_video.field_media_of
     - field.field.media.rdm_video.field_media_video_file
     - field.field.media.rdm_video.field_mime_type
+    - field.field.media.rdm_video.field_service_file
     - field.field.media.rdm_video.field_thumbnail_file
     - field.field.media.rdm_video.field_video_service_file
     - media.type.rdm_video
@@ -118,4 +119,5 @@ content:
       placeholder: ''
     region: content
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  field_service_file: true

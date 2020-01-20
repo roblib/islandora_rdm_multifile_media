@@ -9,6 +9,8 @@ dependencies:
     - field.field.media.rdm_image.field_media_image_1
     - field.field.media.rdm_image.field_media_of
     - field.field.media.rdm_image.field_mime_type
+    - field.field.media.rdm_image.field_service_file
+    - field.field.media.rdm_image.field_thumbnail_file
     - field.field.media.rdm_image.field_width
     - field.field.media.rdm_image.fits_ois_file_information_md5che
     - image.style.thumbnail
@@ -128,5 +130,7 @@ hidden:
   entity_print_view_epub: true
   entity_print_view_pdf: true
   entity_print_view_word_docx: true
+  field_service_file: true
+  field_thumbnail_file: true
   langcode: true
   name: true

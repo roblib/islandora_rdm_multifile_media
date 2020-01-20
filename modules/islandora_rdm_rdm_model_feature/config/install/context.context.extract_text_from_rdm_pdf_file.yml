@@ -18,6 +18,7 @@ conditions:
     uri: 'https://schema.org/DigitalDocument'
     context_mapping:
       media: '@islandora.media_route_context_provider:media'
+    logic: and
 reactions:
   file_derivative:
     id: file_derivative

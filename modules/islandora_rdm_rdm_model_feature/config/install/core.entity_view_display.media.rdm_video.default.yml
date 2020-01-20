@@ -7,6 +7,7 @@ dependencies:
     - field.field.media.rdm_video.field_media_of
     - field.field.media.rdm_video.field_media_video_file
     - field.field.media.rdm_video.field_mime_type
+    - field.field.media.rdm_video.field_service_file
     - field.field.media.rdm_video.field_thumbnail_file
     - field.field.media.rdm_video.field_video_service_file
     - image.style.thumbnail
@@ -113,5 +114,6 @@ hidden:
   entity_print_view_epub: true
   entity_print_view_pdf: true
   entity_print_view_word_docx: true
+  field_service_file: true
   langcode: true
   name: true
