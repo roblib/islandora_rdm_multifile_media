@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\media\Entity\Media;
+use Drupal\Core\File\FileSystem;
 
 /**
  * Class MediaSourceController.
@@ -18,6 +19,13 @@ use Drupal\media\Entity\Media;
  * @package Drupal\islandora\Controller
  */
 class MediaSourceController extends ControllerBase {
+
+  /**
+   * File system service.
+   *
+   * @var \Drupal\Core\File\FileSystem
+   */
+  protected $fileSystem;
 
   /**
    * Islandora utils.
@@ -33,9 +41,11 @@ class MediaSourceController extends ControllerBase {
    *   Islandora utils.
    */
   public function __construct(
-    IslandoraUtils $utils
+    IslandoraUtils $utils,
+    FileSystem $fileSystem
   ) {
     $this->utils = $utils;
+    $this->fileSystem = $fileSystem;
   }
 
   /**
@@ -49,7 +59,8 @@ class MediaSourceController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('islandora.utils')
+      $container->get('islandora.utils'),
+      $container->get('file_system')
     );
   }
 
@@ -76,6 +87,10 @@ class MediaSourceController extends ControllerBase {
     $content_location = $request->headers->get('Content-Location', "");
     $contents = $request->getContent();
     if ($contents) {
+      $directory = $this->fileSystem->dirname($content_location);
+      if (!file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+        throw new HttpException(500, "The destination directory does not exist, could not be created, or is not writable");
+      }
       $file = file_save_data($contents, $content_location, FILE_EXISTS_REPLACE);
       $media->{$destination_field}->setValue([
         'target_id' => $file->id(),
@@ -113,16 +128,25 @@ class MediaSourceController extends ControllerBase {
     $contents = $request->getContent();
 
     if ($contents) {
-      \Drupal::logger('Alan_dev')->warning("Content location is $content_location");
+      $directory = $this->fileSystem->dirname($content_location);
+      if (!file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
+        throw new HttpException(500, "The destination directory does not exist, could not be created, or is not writable");
+      }
       $file = file_save_data($contents, $content_location, FILE_EXISTS_REPLACE);
-      $media->{$destination_field}->setValue([
-        'target_id' => $file->id(),
-      ]);
-      $media->{$destination_text_field}->setValue(nl2br($contents));
-      $media->save();
-
-      return new Response("<h1>Complete</h1>");
+      if ($media->hasField($destination_field)) {
+        $media->{$destination_field}->setValue([
+          'target_id' => $file->id(),
+        ]);
+      }
+      else {
+        \Drupal::logger('islandora_text_extraction')->warning("Field $destination_field is not set on {$media->bundle()}");
+      }
+      if ($media->hasField($destination_text_field)) {
+        $media->{$destination_text_field}->setValue(nl2br($contents));
+        $media->save();
+      }
     }
+    return new Response("<h1>Complete</h1>");
   }
 
   /**
