@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains playground.module.
+ * Contains Multimedia Module File.
  */
 
 use Drupal\Core\Entity\EntityInterface;
