@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\media\MediaInterface;
 use Drupal\node\NodeInterface;
 
@@ -85,6 +86,7 @@ function islandora_rdm_multifile_media_entity_view_mode_alter(&$view_mode, Entit
     }
   }
 }
+
 /**
  * Implements hook_form_form_id_alter().
  */
