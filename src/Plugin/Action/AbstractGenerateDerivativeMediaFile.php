@@ -165,10 +165,10 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
       throw new \RuntimeException("Could not locate source file for media {$entity->id()}", 500);
     }
     $data['source_uri'] = $this->utils->getDownloadUrl($source_file);
-
+    $destination_field = $this->configuration['destination_field_name'];
     $route_params = [
       'media' => $entity->id(),
-      'destination_field' => $this->configuration['destination_field_name'],
+      'destination_field' => $destination_field,
     ];
     $data['destination_uri'] = Url::fromRoute('islandora_rdm_multifile_media.attach_file_to_media', $route_params)
       ->setAbsolute()
@@ -177,8 +177,10 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
     $token_data = [
       'media' => $entity,
     ];
+    $field = \Drupal::entityTypeManager()->getStorage('field_storage_config')->load("media.$destination_field");
+    $scheme = $field->getSetting('uri_scheme');
     $path = $this->token->replace($data['path'], $token_data);
-    $data['file_upload_uri'] = $data['scheme'] . '://' . $path;
+    $data['file_upload_uri'] = $scheme . '://' . $path;
     $allowed = ['queue',
       'event',
       'args',
