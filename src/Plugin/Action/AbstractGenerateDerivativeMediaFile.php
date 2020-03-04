@@ -201,8 +201,6 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $schemes = $this->utils->getFilesystemSchemes();
-    $scheme_options = array_combine($schemes, $schemes);
     $form = parent::buildConfigurationForm($form, $form_state);
     $map = $this->entityFieldManager->getFieldMapByFieldType('file');
     $file_fields = $map['media'];
@@ -232,13 +230,6 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
       '#default_value' => $this->configuration['args'],
       '#rows' => '8',
       '#description' => t('Additional command line arguments'),
-    ];
-    $form['scheme'] = [
-      '#type' => 'select',
-      '#title' => t('File system'),
-      '#options' => $scheme_options,
-      '#default_value' => $this->configuration['scheme'],
-      '#required' => TRUE,
     ];
     $form['path'] = [
       '#type' => 'textfield',
@@ -287,7 +278,6 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
     parent::submitConfigurationForm($form, $form_state);
     $this->configuration['mimetype'] = $form_state->getValue('mimetype');
     $this->configuration['args'] = $form_state->getValue('args');
-    $this->configuration['scheme'] = $form_state->getValue('scheme');
     $this->configuration['path'] = trim($form_state->getValue('path'), '\\/');
     $this->configuration['destination_field_name'] = $form_state->getValue('destination_field_name');
   }
