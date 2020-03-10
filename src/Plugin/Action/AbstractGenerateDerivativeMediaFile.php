@@ -16,6 +16,7 @@ use Drupal\jwt\Authentication\Provider\JwtAuth;
 use Drupal\token\Token;
 use Stomp\StatefulStomp;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Database\Connection;
 
 /**
  * Emits a Node for generating derivatives event.
@@ -83,6 +84,8 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
    *   Token service.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   Field Manager service.
+   * @param \Drupal\Core\Database\Connection $database
+   *   A database connection.
    */
   public function __construct(
     array $configuration,
@@ -96,7 +99,8 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
     IslandoraUtils $utils,
     MediaSourceService $media_source,
     Token $token,
-    EntityFieldManagerInterface $entity_field_manager
+    EntityFieldManagerInterface $entity_field_manager,
+    Connection $database
   ) {
     parent::__construct(
       $configuration,
@@ -106,12 +110,14 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
       $entity_type_manager,
       $event_generator,
       $stomp,
-      $auth
+      $auth,
+      $database
     );
     $this->utils = $utils;
     $this->mediaSource = $media_source;
     $this->token = $token;
     $this->entityFieldManager = $entity_field_manager;
+    $this->database = $database;
   }
 
   /**
@@ -130,7 +136,8 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
       $container->get('islandora.utils'),
       $container->get('islandora.media_source_service'),
       $container->get('token'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('database')
     );
   }
 
@@ -157,6 +164,11 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
    */
   protected function generateData(EntityInterface $entity) {
     $data = parent::generateData($entity);
+    $action_id = \Drupal::request()->request->get('action');
+    $actions = $this->entityTypeManager->getStorage('action')->loadByProperties(['id' => $action_id]);
+    $action = $actions[$action_id];
+    $label = $action->label();
+
     if (get_class($entity) != 'Drupal\media\Entity\Media') {
       return;
     }
@@ -166,9 +178,19 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
     }
     $data['source_uri'] = $this->utils->getDownloadUrl($source_file);
     $destination_field = $this->configuration['destination_field_name'];
+    $query = $this->database->insert('islandora_derivative_tracking');
+    $query->fields([
+      'action' => $label,
+      'mid' =>  $entity->id(),
+      'time' => \Drupal::time()->getCurrentTime(),
+      'state' => 'started',
+    ]);
+    $jid = $query->execute();
+    $time = \Drupal::time()->getCurrentTime();
     $route_params = [
       'media' => $entity->id(),
       'destination_field' => $destination_field,
+      'jid' => $jid,
     ];
     $data['destination_uri'] = Url::fromRoute('islandora_rdm_multifile_media.attach_file_to_media', $route_params)
       ->setAbsolute()

@@ -1,0 +1,42 @@
+<?php
+/**
+ * Implements hook_schema().
+ */
+function islandora_rdm_multifile_media_schema() {
+  $schema['islandora_derivative_tracking'] = [
+    'description' => 'Tracks derivative creations',
+    'fields' => [
+      'jid' => [
+        'description' => 'Autoincrementing id for record',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'time' => [
+        'description' => 'Request time.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'action' => [
+        'description' => 'triggering action',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ],
+      'mid' => [
+        'description' => 'Media ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ],
+      'state' => [
+        'description' => 'Job State',
+        'length' => 128,
+        'type' => 'varchar',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['jid'],
+  ];
+  return $schema;
+}

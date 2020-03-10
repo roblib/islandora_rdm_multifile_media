@@ -4,14 +4,16 @@ namespace Drupal\islandora_rdm_multifile_media\Controller;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\File\FileSystem;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\islandora\IslandoraUtils;
+use Drupal\media\Entity\Media;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\media\Entity\Media;
-use Drupal\Core\File\FileSystem;
+
 
 /**
  * Class MediaSourceController.
@@ -35,6 +37,13 @@ class MediaSourceController extends ControllerBase {
   protected $utils;
 
   /**
+   * Islandora utils.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * MediaSourceController constructor.
    *
    * @param \Drupal\islandora\IslandoraUtils $utils
@@ -42,10 +51,12 @@ class MediaSourceController extends ControllerBase {
    */
   public function __construct(
     IslandoraUtils $utils,
-    FileSystem $fileSystem
+    FileSystem $fileSystem,
+    Connection $database
   ) {
     $this->utils = $utils;
     $this->fileSystem = $fileSystem;
+    $this->database = $database;
   }
 
   /**
@@ -60,7 +71,8 @@ class MediaSourceController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('islandora.utils'),
-      $container->get('file_system')
+      $container->get('file_system'),
+      $container->get('database')
     );
   }
 
@@ -83,7 +95,9 @@ class MediaSourceController extends ControllerBase {
   public function attachToMedia(
     Media $media,
     string $destination_field,
+    int $jid,
     Request $request) {
+    $this->update_status('reached endpoint', $jid);
     $content_location = $request->headers->get('Content-Location', "");
     $contents = $request->getContent();
     if ($contents) {
@@ -95,7 +109,11 @@ class MediaSourceController extends ControllerBase {
       $media->{$destination_field}->setValue([
         'target_id' => $file->id(),
       ]);
-      $media->save();
+      $success = $media->save();
+      if ($success) {
+        $this->update_status('complete', $jid);
+      }
+
     }
     // Should only see this with a GET request for testing.
     return new Response("<h1>Complete</h1>");
@@ -139,7 +157,8 @@ class MediaSourceController extends ControllerBase {
         ]);
       }
       else {
-        \Drupal::logger('islandora_text_extraction')->warning("Field $destination_field is not set on {$media->bundle()}");
+        \Drupal::logger('islandora_text_extraction')
+          ->warning("Field $destination_field is not set on {$media->bundle()}");
       }
       if ($media->hasField($destination_text_field)) {
         $media->{$destination_text_field}->setValue(nl2br($contents));
@@ -164,6 +183,15 @@ class MediaSourceController extends ControllerBase {
     $media = $route_match->getParameter('media');
     $node = $this->utils->getParentNode($media);
     return AccessResult::allowedIf($node->access('update', $account) && $account->hasPermission('create media'));
+  }
+
+  public function update_status($status, $jid) {
+    $this->database->update('islandora_derivative_tracking')
+      ->fields([
+        'state' => '$status',
+      ])
+      ->condition('jid', $jid)
+      ->execute();
   }
 
 }

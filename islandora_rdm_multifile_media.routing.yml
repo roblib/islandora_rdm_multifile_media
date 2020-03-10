@@ -1,5 +1,5 @@
 islandora_rdm_multifile_media.attach_file_to_media:
-  path: '/media/add_derivative/{media}/{destination_field}'
+  path: '/media/add_derivative/{media}/{destination_field}/{jid}'
   defaults:
     _controller: '\Drupal\islandora_rdm_multifile_media\Controller\MediaSourceController::attachToMedia'
   methods: [GET, PUT]
