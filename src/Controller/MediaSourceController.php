@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\media\Entity\Media;
 use Drupal\Core\File\FileSystem;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class MediaSourceController.
