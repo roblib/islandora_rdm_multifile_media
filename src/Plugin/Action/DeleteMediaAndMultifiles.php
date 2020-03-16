@@ -64,7 +64,6 @@ class DeleteMediaAndMultifiles extends DeleteMediaAndFile implements ContainerFa
         $file->delete();
       }
     }
-    $entity->delete();
   }
 
   /**
