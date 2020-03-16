@@ -13,7 +13,8 @@ use Drupal\file\Entity\File;
  *   id = "media_source_mimetype",
  *   label = @Translation("Media Source Mimetype"),
  *   context = {
- *     "media" = @ContextDefinition("entity:media", required = FALSE, label = @Translation("Media"))
+ *     "media" = @ContextDefinition("entity:media", required = FALSE, label =
+ *   @Translation("Media"))
  *   }
  * )
  */
@@ -43,7 +44,8 @@ class MediaSourceHasMimetype extends ConditionPluginBase {
   }
 
   /**
-   * {@inheritdoc}
+   * {@inheritdoc}:q
+   * 
    */
   public function evaluate() {
     foreach ($this->getContexts() as $context) {
@@ -52,9 +54,12 @@ class MediaSourceHasMimetype extends ConditionPluginBase {
         $mid = $entity->id();
         if ($mid && !empty($this->configuration['mimetype'])) {
           $source = $entity->getSource();
-          $source_file = File::load($source->getSourceFieldValue($entity));
-          if ($this->configuration['mimetype'] == $source_file->getMimeType()) {
-            return !$this->isNegated();
+          if ($source) {
+            $source_field_value = $source->getSourceFieldValue($entity);
+            $source_file = File::load($source_field_value);
+            if ($source_file && $this->configuration['mimetype'] == $source_file->getMimeType()) {
+              return !$this->isNegated();
+            }
           }
         }
       }

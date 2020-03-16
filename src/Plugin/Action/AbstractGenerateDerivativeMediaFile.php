@@ -163,12 +163,8 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
    * Override this to return arbitrary data as an array to be json encoded.
    */
   protected function generateData(EntityInterface $entity) {
-    $data = parent::generateData($entity);
-    $action_id = \Drupal::request()->request->get('action');
-    $actions = $this->entityTypeManager->getStorage('action')->loadByProperties(['id' => $action_id]);
-    $action = $actions[$action_id];
-    $label = $action->label();
 
+    $data = parent::generateData($entity);
     if (get_class($entity) != 'Drupal\media\Entity\Media') {
       return;
     }
@@ -178,19 +174,10 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
     }
     $data['source_uri'] = $this->utils->getDownloadUrl($source_file);
     $destination_field = $this->configuration['destination_field_name'];
-    $query = $this->database->insert('islandora_derivative_tracking');
-    $query->fields([
-      'action' => $label,
-      'mid' =>  $entity->id(),
-      'time' => \Drupal::time()->getCurrentTime(),
-      'state' => 'started',
-    ]);
-    $jid = $query->execute();
-    $time = \Drupal::time()->getCurrentTime();
     $route_params = [
       'media' => $entity->id(),
       'destination_field' => $destination_field,
-      'jid' => $jid,
+      'jid' => $this->get_jid($entity->id()),
     ];
     $data['destination_uri'] = Url::fromRoute('islandora_rdm_multifile_media.attach_file_to_media', $route_params)
       ->setAbsolute()
@@ -327,6 +314,31 @@ class AbstractGenerateDerivativeMediaFile extends EmitEvent {
       return $this->entityTypeManager->getStorage('media_type')->load($id);
     }
     return '';
+  }
+
+  /**
+   * @param $mid
+   *   Id of media.
+   *
+   * @return \Drupal\Core\Database\StatementInterface|int|null
+   *  Job id.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function get_jid($mid) {
+    $action_id = \Drupal::request()->request->get('action');
+    $actions = $this->entityTypeManager->getStorage('action')->loadByProperties(['id' => $action_id]);
+    $action = $actions[$action_id];
+    $label = $action->label();
+    $query = $this->database->insert('islandora_derivative_tracking');
+    $query->fields([
+      'action' => $label,
+      'mid' =>  $mid,
+      'time' => \Drupal::time()->getCurrentTime(),
+      'state' => 'started',
+    ]);
+    return $query->execute();
   }
 
 }
