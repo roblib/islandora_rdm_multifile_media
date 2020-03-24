@@ -4,14 +4,14 @@ namespace Drupal\islandora_rdm_multifile_media\Controller;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\File\FileSystem;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\islandora\IslandoraUtils;
+use Drupal\media\Entity\Media;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\media\Entity\Media;
-use Drupal\Core\File\FileSystem;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -92,11 +92,14 @@ class MediaSourceController extends ControllerBase {
       if (!file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
         throw new HttpException(500, "The destination directory does not exist, could not be created, or is not writable");
       }
-      $file = file_save_data($contents, $content_location, FILE_EXISTS_REPLACE);
-      $media->{$destination_field}->setValue([
-        'target_id' => $file->id(),
-      ]);
-      $media->save();
+      if ($media->hasField($destination_field)) {
+        $file = file_save_data($contents, $content_location, FILE_EXISTS_REPLACE);
+        $media->{$destination_field}->setValue([
+          'target_id' => $file->id(),
+        ]);
+        $media->save();
+      }
+
     }
     // Should only see this with a GET request for testing.
     return new Response("<h1>Complete</h1>");
@@ -140,7 +143,8 @@ class MediaSourceController extends ControllerBase {
         ]);
       }
       else {
-        \Drupal::logger('islandora_text_extraction')->warning("Field $destination_field is not set on {$media->bundle()}");
+        \Drupal::logger('islandora_text_extraction')
+          ->warning("Field $destination_field is not set on {$media->bundle()}");
       }
       if ($media->hasField($destination_text_field)) {
         $media->{$destination_text_field}->setValue(nl2br($contents));
