@@ -49,6 +49,7 @@ class DeleteMediaAndMultifiles extends DeleteMediaAndFile implements ContainerFa
       return;
     }
 
+    $delete = FALSE;
     $fields = $this->entity_field_manager->getFieldDefinitions('media', $entity->bundle());
     $files = [];
     foreach ($fields as $field) {
@@ -62,7 +63,11 @@ class DeleteMediaAndMultifiles extends DeleteMediaAndFile implements ContainerFa
       $file = File::load($target_id);
       if ($file) {
         $file->delete();
+        $delete = TRUE;
       }
+    }
+    if($delete) {
+      $entity->delete();
     }
   }
 
